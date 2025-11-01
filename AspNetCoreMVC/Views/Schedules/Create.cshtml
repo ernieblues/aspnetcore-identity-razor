@@ -1,9 +1,10 @@
-﻿@model AspNetCoreMVC.Models.Schedule
+﻿@using AspNetCoreMVC.Authorization
+@model AspNetCoreMVC.Models.Schedule
 
 @{
     ViewData["Title"] = "Create";
 }
-
+<div asp-validation-summary="All" class="text-danger"></div>
 <h1>Create</h1>
 
 <h4>Schedule</h4>
@@ -12,10 +13,20 @@
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="OwnerId" class="control-label"></label>
-                <select asp-for="OwnerId" class ="form-control" asp-items="ViewBag.OwnerId"></select>
-            </div>
+
+            @if (User.IsInRole(Constants.ScheduleAdministratorsRole) || User.IsInRole(Constants.ScheduleManagersRole))
+            {
+                <div class="form-group">
+                    <label asp-for="OwnerId" class="control-label"></label>
+                    <select asp-for="OwnerId" class="form-select" asp-items="ViewBag.Users"></select>
+                    <span asp-validation-for="OwnerId" class="text-danger"></span>
+                </div>
+            }
+            else
+            {
+                <input type="hidden" asp-for="OwnerId" value="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value" />
+            }
+
             <div class="form-group">
                 <label asp-for="Date" class="control-label"></label>
                 <input asp-for="Date" class="form-control" />
@@ -23,25 +34,34 @@
             </div>
             <div class="form-group">
                 <label asp-for="Day" class="control-label"></label>
-                <input asp-for="Day" class="form-control" />
+                <input asp-for="Day" class="form-control" readonly />
                 <span asp-validation-for="Day" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="StartTime" class="control-label"></label>
-                <input asp-for="StartTime" class="form-control" />
+                <select asp-for="StartTime" class="form-select" asp-items="ViewBag.Times"></select>
                 <span asp-validation-for="StartTime" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="EndTime" class="control-label"></label>
-                <input asp-for="EndTime" class="form-control" />
+                <select asp-for="EndTime" class="form-select" asp-items="ViewBag.Times"></select>
                 <span asp-validation-for="EndTime" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control"></select>
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+            
+            @if (User.IsInRole(Constants.ScheduleAdministratorsRole) || User.IsInRole(Constants.ScheduleManagersRole))
+            {
+                <div class="form-group">
+                    <label asp-for="Status" class="control-label"></label>
+                    <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<ScheduleStatus>()"></select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+            }
+            else
+            {
+                <input type="hidden" asp-for="Status" value="Submitted" />
+            }
+
+            <div class="form-group mt-2">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
@@ -54,4 +74,22 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+          const dateInput = document.getElementById('Date');   // matches asp-for="Date"
+          const dayInput  = document.getElementById('Day');    // matches asp-for="Day"
+          const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+          function update() {
+            if (!dateInput?.value) { if (dayInput) dayInput.value = ''; return; }
+            const d = new Date(dateInput.value + 'T00:00:00');
+            if (dayInput) dayInput.value = days[d.getDay()];
+          }
+
+          dateInput?.addEventListener('change', update);
+          update(); // init on load
+        })();
+    </script>
 }

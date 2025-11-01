@@ -1,0 +1,209 @@
+﻿@using AspNetCoreMVC.Authorization
+@using AspNetCoreMVC.Models.ViewModels
+@model WeekData
+
+@{
+    ViewData["Title"] = "Calendar";
+    var start = Model.StartOfWeek;
+    bool isAdminOrManager = User.IsInRole(Constants.ScheduleAdministratorsRole) ||
+        User.IsInRole(Constants.ScheduleManagersRole);
+}
+
+<h1>Schedule</h1>
+
+<div class="d-flex gap-4 mb-3">
+    <a asp-action="Create">Create New</a>
+    <a asp-action="Index">List View</a>
+</div>
+
+<form asp-action="Calendar" method="get" class="d-flex gap-2 align-items-center my-2">
+    <input type="hidden" name="weekStart" value="@start.ToString("yyyy-MM-dd")" />
+    <button class="btn btn-outline-secondary btn-sm" name="nav" value="back">◀ Previous</button>
+    <button class="btn btn-outline-secondary btn-sm" name="nav" value="forward">Next ▶</button>
+</form>
+
+<table class="table table-bordered table-sm text-center">
+    <thead class="table-light">
+        <tr>
+            <th>Monday<br /><small class="text-muted">@start.AddDays(0).ToString("M/d/yyyy")</small></th>
+            <th>Tuesday<br /><small class="text-muted">@start.AddDays(1).ToString("M/d/yyyy")</small></th>
+            <th>Wednesday<br /><small class="text-muted">@start.AddDays(2).ToString("M/d/yyyy")</small></th>
+            <th>Thursday<br /><small class="text-muted">@start.AddDays(3).ToString("M/d/yyyy")</small></th>
+            <th>Friday<br /><small class="text-muted">@start.AddDays(4).ToString("M/d/yyyy")</small></th>
+            <th>Saturday<br /><small class="text-muted">@start.AddDays(5).ToString("M/d/yyyy")</small></th>
+            <th>Sunday<br /><small class="text-muted">@start.AddDays(6).ToString("M/d/yyyy")</small></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="align-top text-center">
+                @foreach (var s in Model.Monday)
+                {
+                    <div class="border rounded p-1 mb-2">
+                        <div class="fw-semibold">@s.User.Email</div>
+                        <div>@s.StartTime – @s.EndTime</div>
+                        <div class="text-muted">@s.Status</div>
+
+                        @{
+                            bool isOwner = s.OwnerId == @ViewBag.UserId;
+                        }
+                        
+                        @if (isAdminOrManager || isOwner)
+                        {
+                            <div>
+                                <a asp-controller="Schedules" asp-action="Edit" asp-route-id="@s.ScheduleId">Edit</a> |
+                                <a asp-controller="Schedules" asp-action="Details" asp-route-id="@s.ScheduleId">Details</a> |
+                                <a asp-controller="Schedules" asp-action="Delete" asp-route-id="@s.ScheduleId">Delete</a>
+                            </div>
+                        }
+                        
+                    </div>
+                }
+            </td>
+            <td class="align-top text-center">
+                @foreach (var s in Model.Tuesday)
+                {
+                    <div class="border rounded p-1 mb-2">
+                        <div class="fw-semibold">@s.User.Email</div>
+                        <div>@s.StartTime – @s.EndTime</div>
+                        <div class="text-muted">@s.Status</div>
+
+                        @{
+                            bool isOwner = s.OwnerId == @ViewBag.UserId;
+                        }
+
+                        @if (isAdminOrManager || isOwner)
+                        {
+                            <div>
+                                <a asp-controller="Schedules" asp-action="Edit" asp-route-id="@s.ScheduleId">Edit</a> |
+                                <a asp-controller="Schedules" asp-action="Details" asp-route-id="@s.ScheduleId">Details</a> |
+                                <a asp-controller="Schedules" asp-action="Delete" asp-route-id="@s.ScheduleId">Delete</a>
+                            </div>
+                        }
+
+                    </div>
+                }
+            </td>
+            <td class="align-top text-center">
+                @foreach (var s in Model.Wednesday)
+                {
+                    <div class="border rounded p-1 mb-2">
+                        <div class="fw-semibold">@s.User.Email</div>
+                        <div>@s.StartTime – @s.EndTime</div>
+                        <div class="text-muted">@s.Status</div>
+
+                        @{
+                            bool isOwner = s.OwnerId == @ViewBag.UserId;
+                        }
+
+                        @if (isAdminOrManager || isOwner)
+                        {
+                            <div>
+                                <a asp-controller="Schedules" asp-action="Edit" asp-route-id="@s.ScheduleId">Edit</a> |
+                                <a asp-controller="Schedules" asp-action="Details" asp-route-id="@s.ScheduleId">Details</a> |
+                                <a asp-controller="Schedules" asp-action="Delete" asp-route-id="@s.ScheduleId">Delete</a>
+                            </div>
+                        }
+
+                    </div>
+                }
+            </td>
+            <td class="align-top text-center">
+                @foreach (var s in Model.Thursday)
+                {
+                    <div class="border rounded p-1 mb-2">
+                        <div class="fw-semibold">@s.User.Email</div>
+                        <div>@s.StartTime – @s.EndTime</div>
+                        <div class="text-muted">@s.Status</div>
+
+                        @{
+                            bool isOwner = s.OwnerId == @ViewBag.UserId;
+                        }
+
+                        @if (isAdminOrManager || isOwner)
+                        {
+                            <div>
+                                <a asp-controller="Schedules" asp-action="Edit" asp-route-id="@s.ScheduleId">Edit</a> |
+                                <a asp-controller="Schedules" asp-action="Details" asp-route-id="@s.ScheduleId">Details</a> |
+                                <a asp-controller="Schedules" asp-action="Delete" asp-route-id="@s.ScheduleId">Delete</a>
+                            </div>
+                        }
+
+                    </div>
+                }
+            </td>
+            <td class="align-top text-center">
+                @foreach (var s in Model.Friday)
+                {
+                    <div class="border rounded p-1 mb-2">
+                        <div class="fw-semibold">@s.User.Email</div>
+                        <div>@s.StartTime – @s.EndTime</div>
+                        <div class="text-muted">@s.Status</div>
+
+                        @{
+                            bool isOwner = s.OwnerId == @ViewBag.UserId;
+                        }
+
+                        @if (isAdminOrManager || isOwner)
+                        {
+                            <div>
+                                <a asp-controller="Schedules" asp-action="Edit" asp-route-id="@s.ScheduleId">Edit</a> |
+                                <a asp-controller="Schedules" asp-action="Details" asp-route-id="@s.ScheduleId">Details</a> |
+                                <a asp-controller="Schedules" asp-action="Delete" asp-route-id="@s.ScheduleId">Delete</a>
+                            </div>
+                        }
+
+                    </div>
+                }
+            </td>
+            <td class="align-top text-center">
+                @foreach (var s in Model.Saturday)
+                {
+                    <div class="border rounded p-1 mb-2">
+                        <div class="fw-semibold">@s.User.Email</div>
+                        <div>@s.StartTime – @s.EndTime</div>
+                        <div class="text-muted">@s.Status</div>
+
+                        @{
+                            bool isOwner = s.OwnerId == @ViewBag.UserId;
+                        }
+
+                        @if (isAdminOrManager || isOwner)
+                        {
+                            <div>
+                                <a asp-controller="Schedules" asp-action="Edit" asp-route-id="@s.ScheduleId">Edit</a> |
+                                <a asp-controller="Schedules" asp-action="Details" asp-route-id="@s.ScheduleId">Details</a> |
+                                <a asp-controller="Schedules" asp-action="Delete" asp-route-id="@s.ScheduleId">Delete</a>
+                            </div>
+                        }
+
+                    </div>
+                }
+            </td>
+            <td class="align-top text-center">
+                @foreach (var s in Model.Sunday)
+                {
+                    <div class="border rounded p-1 mb-2">
+                        <div class="fw-semibold">@s.User.Email</div>
+                        <div>@s.StartTime – @s.EndTime</div>
+                        <div class="text-muted">@s.Status</div>
+
+                        @{
+                            bool isOwner = s.OwnerId == @ViewBag.UserId;
+                        }
+
+                        @if (isAdminOrManager || isOwner)
+                        {
+                            <div>
+                                <a asp-controller="Schedules" asp-action="Edit" asp-route-id="@s.ScheduleId">Edit</a> |
+                                <a asp-controller="Schedules" asp-action="Details" asp-route-id="@s.ScheduleId">Details</a> |
+                                <a asp-controller="Schedules" asp-action="Delete" asp-route-id="@s.ScheduleId">Delete</a>
+                            </div>
+                        }
+
+                    </div>
+                }
+            </td>
+        </tr>
+    </tbody>
+</table>

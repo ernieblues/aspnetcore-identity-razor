@@ -1,22 +1,27 @@
-﻿@model IEnumerable<AspNetCoreMVC.Models.Schedule>
+﻿@using AspNetCoreMVC.Authorization
+@model IEnumerable<AspNetCoreMVC.Models.Schedule>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Schedule";
+    bool isAdminOrManager = User.IsInRole(Constants.ScheduleAdministratorsRole) ||
+        User.IsInRole(Constants.ScheduleManagersRole);
 }
 
-<h1>Index</h1>
+<h1>Schedule</h1>
 
-<p>
+<div class="d-flex gap-4">
     <a asp-action="Create">Create New</a>
-</p>
+    <a asp-action="Calendar">Calendar View</a>
+</div>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.User)
+                <a class="text-body text-decoration-none" asp-action="Index" asp-route-sort="@ViewBag.UserSort">@Html.DisplayNameFor(model => model.User.UserName)</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Date)
+                <a class="text-body text-decoration-none" asp-action="Index" asp-route-sort="@ViewBag.DateSort">@Html.DisplayNameFor(model => model.Date)</a>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Day)
@@ -34,32 +39,43 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Day)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ScheduleId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ScheduleId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ScheduleId">Delete</a>
-            </td>
-        </tr>
-}
+
+    @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Day)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => item.StartTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => item.EndTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+
+                @{
+                    bool isOwner = item.OwnerId == @ViewBag.UserId;
+                }
+
+                @if (isAdminOrManager || isOwner)
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.ScheduleId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.ScheduleId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.ScheduleId">Delete</a>
+                    </td>
+                }
+            
+            </tr>
+    }
+
     </tbody>
 </table>
